@@ -5,6 +5,7 @@ import org.jawk.Main;
 import org.jawk.util.AwkParameters;
 import org.jawk.util.AwkSettings;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -20,11 +21,13 @@ public class TestJawk {
 
         final BlockingQueue<Byte> queue = new ArrayBlockingQueue<>(100);
         BlockingInputStream bis = new BlockingInputStream(queue);
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         Thread t = new Thread(() -> {
                 AwkParameters parameters = new AwkParameters(Main.class, null);
                 AwkSettings settings = parameters.parseCommandLineArguments(new String[]{"{print $3}"});
                 settings.setInput(bis);
+                settings.setOutputStream(bos);
                 Awk awk = new Awk();
                 try {
                     awk.invoke(settings);
@@ -48,6 +51,11 @@ public class TestJawk {
         bis.close();
 
         System.out.println("Waiting for all threads to exit.");
+        t.join();
+
+        System.out.println("Size of bos: " + bos.toByteArray().length);
+        System.out.println("====== OUTPUT");
+        System.out.println(new String(bos.toByteArray()));
     }
 
 }

@@ -90,6 +90,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 	private boolean trap_illegal_format_exceptions;
 	private JRT jrt;
 	private Map<String, JawkExtension> extensions;
+	private PrintStream outStream;
 
 	// stack methods
 	//private Object pop() { return operand_stack.removeFirst(); }
@@ -115,6 +116,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 		trap_illegal_format_exceptions = false;
 		jrt = new JRT(this);	// this = VariableManager
 		this.extensions = Collections.emptyMap();
+		this.outStream = System.out;
 	}
 
 	/**
@@ -139,6 +141,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 		for (JawkExtension ext : extensions.values()) {
 			ext.init(this, jrt, settings);	// this = VariableManager
 		}
+		this.outStream = new PrintStream(settings.getOutputStream());
 	}
 
 	private int nf_offset = NULL_OFFSET;
@@ -274,7 +277,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[1] = item 2
 						// etc.
 						int num_args = position.intArg(0);
-						printTo(System.out, num_args);
+						printTo(outStream, num_args);
 						position.next();
 						break;
 					}
@@ -319,7 +322,7 @@ public class AVM implements AwkInterpreter, VariableManager {
 						// stack[1] = item 1
 						// etc.
 						int num_args = position.intArg(0);
-						printfTo(System.out, num_args);
+						printfTo(outStream, num_args);
 						position.next();
 						break;
 					}
