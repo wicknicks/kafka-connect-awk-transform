@@ -4,7 +4,7 @@ import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.connect.connector.ConnectRecord;
 import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.errors.DataException;
+import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.transforms.Transformation;
 import org.jawk.Awk;
 import org.jawk.util.AwkParameters;
@@ -34,7 +34,7 @@ public class AwkTransform<R extends ConnectRecord<R>> implements Transformation<
             return r.newRecord(r.topic(), r.kafkaPartition(), r.keySchema(), r.key(),
                         Schema.STRING_SCHEMA, out, r.timestamp());
         } else {
-            throw new DataException("Expected value to be of type String, but found: ");
+            throw new ConnectException("Expected value to be of type String, but found " + r.value().getClass());
         }
     }
 
